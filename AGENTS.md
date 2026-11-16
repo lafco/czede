@@ -7,6 +7,9 @@
 > completo é `scripts/release-fork.sh` (tag `v<versao>-fork.<n>` -> CI -> bump de
 > `version`/`hash` em `~/nixos/pkgs/t3code.nix`). Mudança que vira binário sem
 > esse passo simplesmente não chega ao app instalado.
+>
+> Para desenvolver, use o shell do `flake.nix` (`nix develop`) e o loop do dia a
+> dia em [docs/fork-dev.md](./docs/fork-dev.md).
 
 T3 Code is a minimal GUI for coding agents. A Node WebSocket server wraps provider CLIs and agents (Codex, Claude Code, Cursor, Grok, OpenCode, Antigravity, Kiro, Pi, Muse Code, fx) and serves web, desktop, and mobile clients.
 
