@@ -1,5 +1,13 @@
 # T3 Code
 
+> **Este repositório é uma base própria (fork) de `pingdotgg/t3code`.** Antes de
+> mexer em release, CI ou publicar um binário, leia
+> [docs/fork-release.md](./docs/fork-release.md): o `release.yml` do upstream não
+> existe aqui, quem builda é `.github/workflows/release-appimage.yml`, e o fluxo
+> completo é `scripts/release-fork.sh` (tag `v<versao>-fork.<n>` -> CI -> bump de
+> `version`/`hash` em `~/nixos/pkgs/t3code.nix`). Mudança que vira binário sem
+> esse passo simplesmente não chega ao app instalado.
+
 T3 Code is a minimal GUI for coding agents. A Node WebSocket server wraps provider CLIs and agents (Codex, Claude Code, Cursor, Grok, OpenCode, Antigravity, Kiro, Pi, Muse Code, fx) and serves web, desktop, and mobile clients.
 
 You can think of T3 Code as an open source "bring-your-own-subscription" alternative to apps like Claude Desktop, Codex App, Cursor Glass and Conductor.
