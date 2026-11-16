@@ -1,5 +1,24 @@
 # Brand icons
 
+## czede (este fork)
+
+O brand de produção deste repositório **não** vem do Icon Composer. A fonte é
+`assets/czede/`:
+
+- `czede.svg` — timbre arredondado (desktop, favicon, Windows);
+- `czede-square.svg` — timbre quadrado, sem raio (iOS, apple-touch: o sistema
+  aplica a própria máscara).
+
+Os PNG/ICO são gerados por `scripts/build-czede-icons.sh` (`rsvg-convert` +
+`magick`), e `scripts/lib/brand-assets.ts` aponta o brand `production` para eles.
+`vp run icons:export` / `icons:check` continuam existindo para os brands `dev` e
+`nightly`, mas **não** valem para produção aqui: eles regenerariam os ícones do
+T3 a partir de `assets/prod/app-icon.icon`.
+
+---
+
+# Brand icons (upstream)
+
 The three Icon Composer projects are the source of truth for full application icons:
 
 - `dev/app-icon.icon`

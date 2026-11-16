@@ -13,6 +13,9 @@
         ".coderabbit.config.ts",
         ".github/scripts/thread-transfer-report.cjs",
         ".github/scripts/pr-limits.cjs",
+        // Helper do workflow de APK do upstream (mobile-android-apk.yml), que
+        // não existe neste fork; entry para o knip não acusar arquivo órfão.
+        ".github/scripts/mirror-play-apk.cjs",
       ],
       "vite": { "entry": [".github/**/*.test.cjs"] },
       "vitest": { "entry": [".github/**/*.test.cjs"] },
@@ -41,6 +44,11 @@
         "prepare-server-compile-cache.cjs",
         "smoke-desktop-app.ts",
         "verify-windows-desktop-artifact.ts",
+        // No fork só existe release-appimage.yml: estes dois servem os pipelines
+        // do upstream (release.yml, release-desktop.yml) e a doc de operações,
+        // então ficam como entry em vez de acusados de órfãos.
+        "resolve-nightly-release.ts",
+        "smoke-cli-archive.ts",
       ],
       "ignoreDependencies": ["esbuild"],
       // The `t3` npm package's files: copied into the package, never imported.
@@ -101,7 +109,13 @@
     "apps/web": {
       // Worktree setup (scripts/setup-worktree.ts) runs this directly, and evidence
       // fixtures run under node.
-      "entry": ["scripts/warm-dep-cache.ts", "test/fixtures/**/*.mjs"],
+      "entry": [
+        "scripts/warm-dep-cache.ts",
+        "test/fixtures/**/*.mjs",
+        // Era chamado pelo web-preview.yml do upstream; fica como entry porque
+        // o script continua útil para verificar um build local.
+        "scripts/verify-built-boot.ts",
+      ],
       // UI component modules are copied and adapted as cohesive sets. Keep their
       // named subcomponents even before they have callers; the file audit still
       // reports an entire component module when nothing imports it.
