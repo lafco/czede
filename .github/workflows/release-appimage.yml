@@ -3,7 +3,7 @@ name: Release (Linux AppImage)
 # O único workflow deste repositório. O release.yml do upstream não vem junto:
 # ele só roda em pingdotgg/t3code e usa runners Blacksmith daquela org. Este
 # workflow é quem produz o asset que o pacote nix consome --
-# `T3-Code-<versao>-x86_64.AppImage` no release do tag (ver pkgs/t3code.nix).
+# `czede-<versao>-x86_64.AppImage` no release do tag (ver pkgs/t3code.nix).
 #
 # Tag: `v<versao>-fork.<n>`, ex.: v0.1.9-fork.1. O sufixo evita colidir com os
 # tags do upstream, que continuam existindo no remote `upstream`.
@@ -91,7 +91,7 @@ jobs:
 
       # Um passo só: sem --skip-build o script alinha as versões dos manifests,
       # roda `vp run build:desktop` (server + web + Electron main) e empacota.
-      # Saída: release/T3-Code-<versao>-x86_64.AppImage.
+      # Saída: release/czede-<versao>-x86_64.AppImage.
       - name: Build desktop artifact
         shell: bash
         run: |
@@ -103,7 +103,7 @@ jobs:
             --build-version "${{ steps.version.outputs.version }}" \
             --verbose
 
-      # O packager nomeia o AppImage `T3-Code-x86_64.AppImage` (sem versão) para o
+      # O packager nomeia o AppImage `czede-x86_64.AppImage` (sem versão) para o
       # electron-updater poder trocar o arquivo no lugar. Aqui a versão volta ao
       # nome, como nos releases do upstream: o pacote nix baixa por tag + nome.
       - name: Name artifact and checksum
@@ -112,11 +112,11 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          for file in release/T3-Code-*.AppImage; do
-            mv "$file" "release/T3-Code-${VERSION}-x86_64.AppImage"
+          for file in release/czede-*.AppImage; do
+            mv "$file" "release/czede-${VERSION}-x86_64.AppImage"
           done
           ls -l release/
-          sha256sum release/T3-Code-*.AppImage | tee release/SHA256SUMS
+          sha256sum release/czede-*.AppImage | tee release/SHA256SUMS
 
       - name: Publish release
         shell: bash
@@ -127,13 +127,13 @@ jobs:
           set -euo pipefail
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
-              release/T3-Code-*.AppImage \
+              release/czede-*.AppImage \
               release/SHA256SUMS
           else
             gh release create "$TAG" \
-              release/T3-Code-*.AppImage \
+              release/czede-*.AppImage \
               release/SHA256SUMS \
               --repo "$GITHUB_REPOSITORY" \
-              --title "$TAG (fork)" \
+              --title "$TAG" \
               --notes "Build do fork de \`$GITHUB_REPOSITORY\` em $GITHUB_SHA."
           fi

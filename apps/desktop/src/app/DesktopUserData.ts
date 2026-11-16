@@ -40,8 +40,8 @@ export const resolveUserDataPath = Effect.fn("desktop.userData.resolveUserDataPa
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
     const names = input.isDevelopment
-      ? { current: "t3code-dev", legacy: "T3 Code (Dev)" }
-      : { current: "t3code-v2", legacy: "T3 Code (Alpha)" };
+      ? { current: "czede-dev", legacy: "t3code-dev" }
+      : { current: "czede", legacy: "t3code-v2" };
     const destinationPath = path.join(input.appDataDirectory, names.current);
     const legacyPath = path.join(input.appDataDirectory, names.legacy);
     const inspect = (resourcePath: string) =>
@@ -52,8 +52,17 @@ export const resolveUserDataPath = Effect.fn("desktop.userData.resolveUserDataPa
             DesktopUserDataInitializationError.fromFileSystem(cause, "inspect", resourcePath),
           ),
         );
-    if (input.isDevelopment) {
-      return (yield* inspect(legacyPath)) ? legacyPath : destinationPath;
+    // Migração do app anterior (T3 Code): o diretório de dados muda de nome junto
+    // com a identidade. Renomear preserva threads, banco e credenciais inteiros,
+    // e só acontece quando o destino ainda não existe. Falha de rename não é
+    // fatal: o app só começa com dados vazios.
+    if (!(yield* inspect(destinationPath)) && (yield* inspect(legacyPath))) {
+      yield* fs.rename(legacyPath, destinationPath).pipe(
+        Effect.mapError((cause) =>
+          DesktopUserDataInitializationError.fromFileSystem(cause, "create-directory", legacyPath),
+        ),
+        Effect.orElseSucceed(() => undefined),
+      );
     }
     // Chromium databases require their own profile for each running version.
     if (input.platform !== "win32") return destinationPath;

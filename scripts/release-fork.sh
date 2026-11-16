@@ -63,7 +63,7 @@ fi
 
 version="${base}-fork.${n}"
 tag="v${version}"
-asset="T3-Code-${version}-x86_64.AppImage"
+asset="czede-${version}-x86_64.AppImage"
 url="https://github.com/${REPO}/releases/download/${tag}/${asset}"
 
 printf 'ultimo tag : %s\n' "$latest_tag"
@@ -107,7 +107,7 @@ sha256 : ${hash}
 cole em ~/nixos/${NIX_FILE}:
     version = "${version}";
     src = fetchurl {
-      url = "https://github.com/${REPO}/releases/download/v\${version}/T3-Code-\${version}-x86_64.AppImage";
+      url = "https://github.com/${REPO}/releases/download/v\${version}/czede-\${version}-x86_64.AppImage";
       hash = "${hash}";
     };
 
