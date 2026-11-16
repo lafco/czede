@@ -5,9 +5,9 @@
 O brand de produção deste repositório **não** vem do Icon Composer. A fonte é
 `assets/czede/`:
 
-- `czede.svg` — timbre arredondado (desktop, favicon, Windows);
-- `czede-square.svg` — timbre quadrado, sem raio (iOS, apple-touch: o sistema
-  aplica a própria máscara).
+- `czede.svg` — o cubo sem fundo (transparente): desktop, favicon, PWA e Windows;
+- `czede-square.svg` — timbre opaco quadrado (iOS, apple-touch e macOS, que
+  rejeitam ou pintam de preto o alpha).
 
 Os PNG/ICO são gerados por `scripts/build-czede-icons.sh` (`rsvg-convert` +
 `magick`), e `scripts/lib/brand-assets.ts` aponta o brand `production` para eles.
