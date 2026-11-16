@@ -103,10 +103,18 @@ jobs:
             --build-version "${{ steps.version.outputs.version }}" \
             --verbose
 
-      - name: Checksum
+      # O packager nomeia o AppImage `T3-Code-x86_64.AppImage` (sem versão) para o
+      # electron-updater poder trocar o arquivo no lugar. Aqui a versão volta ao
+      # nome, como nos releases do upstream: o pacote nix baixa por tag + nome.
+      - name: Name artifact and checksum
         shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
+          for file in release/T3-Code-*.AppImage; do
+            mv "$file" "release/T3-Code-${VERSION}-x86_64.AppImage"
+          done
           ls -l release/
           sha256sum release/T3-Code-*.AppImage | tee release/SHA256SUMS
 
