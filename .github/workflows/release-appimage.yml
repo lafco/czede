@@ -1,0 +1,131 @@
+name: Release (Linux AppImage)
+
+# O único workflow deste repositório. O release.yml do upstream não vem junto:
+# ele só roda em pingdotgg/t3code e usa runners Blacksmith daquela org. Este
+# workflow é quem produz o asset que o pacote nix consome --
+# `T3-Code-<versao>-x86_64.AppImage` no release do tag (ver pkgs/t3code.nix).
+#
+# Tag: `v<versao>-fork.<n>`, ex.: v0.1.9-fork.1. O sufixo evita colidir com os
+# tags do upstream, que continuam existindo no remote `upstream`.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag já empurrada para este fork, ex.: v0.1.9-fork.1"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-appimage-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  appimage:
+    name: AppImage x64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      # fetch-depth 0: o packager resolve a versão e o commit pelo git.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.tag || github.ref_name }}"
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Tag '$tag' não parece uma versão (vX.Y.Z...)."
+            exit 1
+          fi
+          version="${tag#v}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          # git não tem tag se o workflow rodar em workflow_dispatch e o checkout
+          # não trouxe a tag: recria local para as leituras por git do build.
+          if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            git tag "$tag"
+          fi
+
+      # Os mesmos identificadores públicos que os builds oficiais embutem (chave
+      # publishable do Clerk, template JWT, client id do OAuth da CLI, URL do
+      # relay). Estão no .env.example do repositório por não serem segredo, e é
+      # assim que o upstream builda previews. Sem eles o app sai sem T3 Connect.
+      - name: Load public config
+        shell: bash
+        run: grep -E '^(T3CODE_[A-Z0-9_]+)=' .env.example >> "$GITHUB_ENV"
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-ci-deps
+        with:
+          install-args: --filter=@t3tools/desktop... --filter=t3... --filter=@t3tools/scripts...
+
+      # O helper de segredos do navegador (libsecret) e o electron-builder
+      # precisam destas libs; os nomes t64 são os do Ubuntu 24.04.
+      - name: Install Linux desktop build libraries
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsecret-1-dev pkg-config libgtk-3-0t64 libnss3 libasound2t64 libgbm1
+          if ! command -v magick >/dev/null 2>&1 && ! command -v convert >/dev/null 2>&1; then
+            sudo apt-get install -y imagemagick
+          fi
+
+      # native/resource-monitor e os capture helpers (KDE/Hyprland) são Rust e o
+      # packager compila os dois se não forem reaproveitados.
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      # Um passo só: sem --skip-build o script alinha as versões dos manifests,
+      # roda `vp run build:desktop` (server + web + Electron main) e empacota.
+      # Saída: release/T3-Code-<versao>-x86_64.AppImage.
+      - name: Build desktop artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          vp run dist:desktop:artifact \
+            --platform linux \
+            --target AppImage \
+            --arch x64 \
+            --build-version "${{ steps.version.outputs.version }}" \
+            --verbose
+
+      - name: Checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -l release/
+          sha256sum release/T3-Code-*.AppImage | tee release/SHA256SUMS
+
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+              release/T3-Code-*.AppImage \
+              release/SHA256SUMS
+          else
+            gh release create "$TAG" \
+              release/T3-Code-*.AppImage \
+              release/SHA256SUMS \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TAG (fork)" \
+              --notes "Build do fork de \`$GITHUB_REPOSITORY\` em $GITHUB_SHA."
+          fi
