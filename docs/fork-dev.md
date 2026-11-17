@@ -18,25 +18,33 @@ PATH pelo `shellHook` (`node_modules/.bin`).
 ## Loop do dia a dia
 
 ```sh
+cd ~/repos/czede
 nix develop
 vp run dev             # server + web; abra a pairing URL que ele imprime
 ```
 
 O renderer é servido pelo Vite com hot reload: mudança em `apps/web` aparece sem
-recarregar nada. Mudança em `apps/server` pede restart do runner.
+recarregar nada. Mudança em `apps/server` pede restart do runner. Esse é o loop
+rápido, e nada dele passa por nix, CI ou release.
 
-`vp run dev:desktop` sobe também o shell Electron. Ele **não** funciona direto no
-NixOS: o `electron` do npm é o binário oficial do upstream (não o do nixpkgs),
-que espera `libgtk-3`, `libnss3` e companhia via `/lib` — no NixOS só com
-`nix-ld` + libs compatíveis, e as libs do nixpkgs-unstable exigem glibc mais nova
-que a do sistema. Para usar o desktop em dev, rode dentro de um FHS:
+Também dá para subir só o server (`vp run dev:server`) ou só o web
+(`vp run dev:web`).
+
+## Shell Electron (desktop) em dev
+
+`vp run dev:desktop` precisa do shell do Electron, que é o binário do npm:
+ele espera uma FHS (`/lib`, `ld.so`) e, no NixOS, só acha `gtk`/`nss`/`glib`
+coerentes dentro de um FHS do próprio nixpkgs. Por isso existe um shell que
+monta esse FHS:
 
 ```sh
-nix shell nixpkgs#steam-run -c nix develop -c vp run dev:desktop
+nix develop .#dev-desktop         # sobe server + web + Electron dentro do FHS
+nix develop .#dev-desktop-shell   # shell dentro do FHS, para debugar
+./scripts/dev-desktop.sh          # (dentro do shell acima) sobe o desktop
 ```
 
 Estado do dev: `~/.t3` por padrão (`T3CODE_HOME` muda), **não** o
-`~/.config/t3code-v2` do app instalado. Para começar com uma cópia dos seus
+`~/.config/czede` do app instalado. Para começar com uma cópia dos seus
 projetos e threads paradas: `vp run migrate-dev-db`.
 
 ## Verificação antes de pushar
