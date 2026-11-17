@@ -1353,7 +1353,10 @@ export type ConfirmDialogVariant = "default" | "destructive";
 
 export interface ConfirmDialogOptions {
   readonly variant?: ConfirmDialogVariant;
-  /** Which button takes focus on open. Defaults to Cancel; destructive confirms always keep Cancel. */
+  /**
+   * Which button takes focus on open. Defaults to the destructive choice for
+   * `variant: "destructive"` (Enter confirms a delete) and to Cancel otherwise.
+   */
   readonly initialFocus?: "confirm" | "cancel";
 }
 

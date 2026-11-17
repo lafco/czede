@@ -9,7 +9,6 @@ import {
 import {
   AlertDialog,
   AlertDialogClose,
-  AlertDialogAction,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
@@ -60,7 +59,12 @@ export function ConfirmDialogHost() {
 
   const copy = resolveConfirmDialogCopy(state.status === "idle" ? "" : state.message);
   const confirmVariant = state.status === "idle" ? "default" : state.variant;
-  const focusConfirm = state.status !== "idle" && state.initialFocus === "confirm";
+  const requestedFocus = state.status === "idle" ? undefined : state.initialFocus;
+  // Destrutivo (deletar algo) abre com o Confirm focado: Enter confirma. Quem
+  // quiser o padrão antigo passa initialFocus: "cancel" explícito.
+  const focusConfirm =
+    requestedFocus === "confirm" ||
+    (requestedFocus === undefined && confirmVariant === "destructive");
   const onCancel = () => respondToConfirmDialog(false);
   const onConfirm = () => respondToConfirmDialog(true);
 
@@ -85,13 +89,16 @@ export function ConfirmDialogHost() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-          {focusConfirm && confirmVariant === "default" ? (
-            <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
-          ) : (
-            <Button variant={confirmVariant} onClick={onConfirm}>
-              Confirm
-            </Button>
-          )}
+          {/* `AlertDialogAction` recusa variantes destrutivas (o DialogAction do
+              nixpkgs exclui `destructive` do tipo), então o foco do Confirm
+              destrutivo vem do mesmo marcador que o hook de foco procura. */}
+          <Button
+            variant={confirmVariant}
+            onClick={onConfirm}
+            {...(focusConfirm ? { "data-slot": "dialog-action" } : {})}
+          >
+            Confirm
+          </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>
     </AlertDialog>
