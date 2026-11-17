@@ -52,7 +52,7 @@ export const resolveUserDataPath = Effect.fn("desktop.userData.resolveUserDataPa
             DesktopUserDataInitializationError.fromFileSystem(cause, "inspect", resourcePath),
           ),
         );
-    // Migração do app anterior (T3 Code): o diretório de dados muda de nome junto
+    // Migração do app anterior (czede): o diretório de dados muda de nome junto
     // com a identidade. Renomear preserva threads, banco e credenciais inteiros,
     // e só acontece quando o destino ainda não existe. Falha de rename não é
     // fatal: o app só começa com dados vazios.
