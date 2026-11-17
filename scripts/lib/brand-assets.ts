@@ -1,7 +1,11 @@
+// No fork, qualquer canal (production, nightly, development) usa os ícones de
+// assets/czede/, gerados por scripts/build-czede-icons.sh a partir dos SVG. Os
+// projetos do Icon Composer abaixo ficam só como referência histórica do
+// upstream: `icons:export` não deve ser rodado neste repositório.
 export const BRAND_ASSET_PATHS = {
   developmentIconComposerProject: "assets/dev/app-icon.icon",
-  developmentIosIconPng: "assets/dev/blueprint-ios-1024.png",
-  developmentUniversalIconPng: "assets/dev/blueprint-universal-1024.png",
+  developmentIosIconPng: "assets/czede/czede-ios-1024.png",
+  developmentUniversalIconPng: "assets/czede/czede-universal-1024.png",
 
   productionIconComposerProject: "assets/prod/app-icon.icon",
   // No fork, os exports do brand de produção vêm de assets/czede/, gerados por
@@ -20,25 +24,25 @@ export const BRAND_ASSET_PATHS = {
   productionWebIcon512Png: "assets/czede/czede-web-icon-512x512.png",
 
   nightlyIconComposerProject: "assets/nightly/app-icon.icon",
-  nightlyIosIconPng: "assets/nightly/nightly-ios-1024.png",
-  nightlyMacIconPng: "assets/nightly/nightly-macos-1024.png",
-  nightlyLinuxIconPng: "assets/nightly/nightly-universal-1024.png",
-  nightlyWindowsIconIco: "assets/nightly/nightly-windows.ico",
-  nightlyWebFaviconIco: "assets/nightly/nightly-web-favicon.ico",
-  nightlyWebFavicon16Png: "assets/nightly/nightly-web-favicon-16x16.png",
-  nightlyWebFavicon32Png: "assets/nightly/nightly-web-favicon-32x32.png",
-  nightlyWebAppleTouchIconPng: "assets/nightly/nightly-web-apple-touch-180.png",
-  nightlyWebIcon192Png: "assets/nightly/nightly-web-icon-192x192.png",
-  nightlyWebIcon512Png: "assets/nightly/nightly-web-icon-512x512.png",
+  nightlyIosIconPng: "assets/czede/czede-ios-1024.png",
+  nightlyMacIconPng: "assets/czede/czede-macos-1024.png",
+  nightlyLinuxIconPng: "assets/czede/czede-universal-1024.png",
+  nightlyWindowsIconIco: "assets/czede/czede-windows.ico",
+  nightlyWebFaviconIco: "assets/czede/czede-web-favicon.ico",
+  nightlyWebFavicon16Png: "assets/czede/czede-web-favicon-16x16.png",
+  nightlyWebFavicon32Png: "assets/czede/czede-web-favicon-32x32.png",
+  nightlyWebAppleTouchIconPng: "assets/czede/czede-web-apple-touch-180.png",
+  nightlyWebIcon192Png: "assets/czede/czede-web-icon-192x192.png",
+  nightlyWebIcon512Png: "assets/czede/czede-web-icon-512x512.png",
 
-  developmentDesktopIconPng: "assets/dev/blueprint-macos-1024.png",
-  developmentWindowsIconIco: "assets/dev/blueprint-windows.ico",
-  developmentWebFaviconIco: "assets/dev/blueprint-web-favicon.ico",
-  developmentWebFavicon16Png: "assets/dev/blueprint-web-favicon-16x16.png",
-  developmentWebFavicon32Png: "assets/dev/blueprint-web-favicon-32x32.png",
-  developmentWebAppleTouchIconPng: "assets/dev/blueprint-web-apple-touch-180.png",
-  developmentWebIcon192Png: "assets/dev/blueprint-web-icon-192x192.png",
-  developmentWebIcon512Png: "assets/dev/blueprint-web-icon-512x512.png",
+  developmentDesktopIconPng: "assets/czede/czede-macos-1024.png",
+  developmentWindowsIconIco: "assets/czede/czede-windows.ico",
+  developmentWebFaviconIco: "assets/czede/czede-web-favicon.ico",
+  developmentWebFavicon16Png: "assets/czede/czede-web-favicon-16x16.png",
+  developmentWebFavicon32Png: "assets/czede/czede-web-favicon-32x32.png",
+  developmentWebAppleTouchIconPng: "assets/czede/czede-web-apple-touch-180.png",
+  developmentWebIcon192Png: "assets/czede/czede-web-icon-192x192.png",
+  developmentWebIcon512Png: "assets/czede/czede-web-icon-512x512.png",
 } as const;
 
 export type WebAssetBrand = "development" | "nightly" | "production";
